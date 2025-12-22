@@ -5,9 +5,9 @@ A gimp plugin to visualize the current layer as a 3d heightmap
 Download a release from the releases tab
 
 And locate your plug-ins folder for your installation of gimp
-* Windows: %APPDATA%/GIMP/3.(VERSION)/plug-ins/
-* Linux: $XDG_CONFIG_HOME/GIMP/3.(VERSION)/plug-ins/
-* Mac: create NSApplicationSupportDirectory/GIMP/3.(VERSION)/plug-ins
+* Windows: `%APPDATA%/GIMP/3.(VERSION)/plug-ins/`
+* Linux: `$XDG_CONFIG_HOME/GIMP/3.(VERSION)/plug-ins/`
+* Mac: `create NSApplicationSupportDirectory/GIMP/3.(VERSION)/plug-ins`
 
 In this plug-ins folder, create a new folder named `heightmap-visualizer-vft` and install your downloaded executable into that folder
 
@@ -33,3 +33,12 @@ Watch the beautiful visualization!
 
 ## If you're on windows
 Download mingw and make sure you have make and gcc installed
+
+# Gallery
+
+A roughness texture
+![visualizing a roughness texture](img/gallery-1.png)
+A low resolution image
+![visualizing a low-res crater shape](img/gallery-1.png)
+A high resolution image
+![visualizing a high-res puppy image with rainbow gradient](img/gallery-1.png)
