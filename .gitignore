@@ -1,0 +1,8 @@
+out/*
+error.txt
+out.txt
+output.txt
+logfile.txt
+*.exe
+*.xcf
+example.c

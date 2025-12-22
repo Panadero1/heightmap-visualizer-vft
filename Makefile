@@ -1,0 +1,51 @@
+CFLAGS = -IC:/Users/User/Documents/Code/gimp/gimp/../_install/include/gimp-3.0 \
+-IC:/Users/User/Documents/Code/heightmap-visualizer-vft/lib/libepoxy/include \
+-IC:/Users/User/Documents/Code/heightmap-visualizer-vft/lib/cglm/include \
+-IC:/msys64/clang64/include/gtk-3.0 \
+-IC:/msys64/clang64/include/pango-1.0 \
+-IC:/msys64/clang64/include \
+-IC:/msys64/clang64/include/harfbuzz \
+-IC:/msys64/clang64/include/cairo \
+-IC:/msys64/clang64/include/atk-1.0 \
+-IC:/msys64/clang64/include/fribidi \
+-IC:/Users/User/Documents/Code/gimp/_install/include/gegl-0.4 \
+-IC:/msys64/clang64/include/json-glib-1.0 \
+-IC:/Users/User/Documents/Code/gimp/_install/include/babl-0.1 \
+-IC:/Users/User/Documents/Code/gimp/_install/include -DINI_SHARED_LIB \
+-IC:/msys64/clang64/include/freetype2 \
+-IC:/msys64/clang64/include/pixman-1 \
+-IC:/msys64/clang64/include/gdk-pixbuf-2.0 \
+-IC:/msys64/clang64/include/libpng16 \
+-IC:/msys64/clang64/include/webp \
+-DLIBDEFLATE_DLL \
+-IC:/msys64/clang64/include/gio-win32-2.0 \
+-IC:/msys64/clang64/include/glib-2.0 \
+-IC:/msys64/clang64/lib/glib-2.0/include \
+-mwindows \
+-LC:/Users/User/Documents/Code/gimp/gimp/../_install/lib \
+-LC:/Users/User/Documents/Code/heightmap-visualizer-vft/lib/libepoxy/_build/src \
+-l'gimpui-3.0' -l'gimpwidgets-3.0' -l'gimpmodule-3.0' -l'gimp-3.0' \
+-l'gimpbase-3.0' -l'gimpcolor-3.0' -l'gimpconfig-3.0' -l'gimpmath-3.0' \
+-LC:/msys64/clang64/lib -lgtk-3 -lgdk-3 -lz -lgdi32 -limm32 \
+-lshell32 -lole32 -luuid -lwinmm -ldwmapi -lsetupapi -lcfgmgr32 \
+-lhid -lwinspool -lcomctl32 -lcomdlg32 -l'pangocairo-1.0' \
+-l'pangowin32-1.0' -l'pango-1.0' -lcairo-gobject -l'atk-1.0' \
+-LC:/Users/User/Documents/Code/gimp/_install/lib \
+-l'gegl-0.4' -l'gegl-npd-0.4' -l'json-glib-1.0' -l'babl-0.1' -lgexiv2 \
+-lcairo -lharfbuzz -l'gdk_pixbuf-2.0' -l'gio-2.0' -l'gobject-2.0' \
+-l'gmodule-2.0' -l'glib-2.0' -lintl -lepoxy -lm \
+-Wno-unused-command-line-argument
+
+CC = clang
+
+test: install
+	gimp
+
+install: build
+	bash -c "cp /mnt/c/Users/User/Documents/Code/heightmap-visualizer-vft/heightmap-visualizer-vft.exe /mnt/c/Users/User/AppData/Roaming/GIMP/3.1/plug-ins/heightmap-visualizer-vft/heightmap-visualizer-vft.exe"
+
+build: out/main.o
+	$(CC) -o heightmap-visualizer-vft.exe out/*.o $(CFLAGS)
+
+out/main.o: heightmap-visualizer-vft.c
+	$(CC) -o out/main.o -c heightmap-visualizer-vft.c $(CFLAGS)
