@@ -39,6 +39,6 @@ Download mingw and make sure you have make and gcc installed
 A roughness texture
 ![visualizing a roughness texture](img/gallery-1.png)
 A low resolution image
-![visualizing a low-res crater shape](img/gallery-1.png)
+![visualizing a low-res crater shape](img/gallery-2.png)
 A high resolution image
-![visualizing a high-res puppy image with rainbow gradient](img/gallery-1.png)
+![visualizing a high-res puppy image with rainbow gradient](img/gallery-3.png)
