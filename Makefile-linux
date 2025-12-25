@@ -1,6 +1,6 @@
-CFLAGS = -I/home/jacob/Code/gimp/include/gimp-3.0 \
--I/home/jacob/Code/heightmap-visualizer-vft/lib/libepoxy/include \
--I/home/jacob/Code/heightmap-visualizer-vft/lib/cglm/include \
+CFLAGS = -I$(GIMP_PREFIX)/include/gimp-3.0 \
+-Ilib/libepoxy/include \
+-Ilib/cglm/include \
 -I/usr/include/gtk-3.0 \
 -I/usr/include/pango-1.0 \
 -I/usr/include/cloudproviders \
@@ -12,9 +12,9 @@ CFLAGS = -I/home/jacob/Code/gimp/include/gimp-3.0 \
 -I/usr/lib/dbus-1.0/include \
 -I/usr/include/fribidi \
 -I/usr/include/harfbuzz \
--I/home/jacob/Code/gimp/include/gegl-0.4 \
+-I$(GIMP_PREFIX)/include/gegl-0.4 \
 -I/usr/include/json-glib-1.0 \
--I/home/jacob/Code/gimp/include/babl-0.1 \
+-I$(GIMP_PREFIX)/include/babl-0.1 \
 -I/usr/include/pixman-1 \
 -I/usr/include/gdk-pixbuf-2.0 \
 -I/usr/include/glycin-2 \
@@ -27,8 +27,8 @@ CFLAGS = -I/home/jacob/Code/gimp/include/gimp-3.0 \
 -I/usr/lib/glib-2.0/include \
 -I/usr/include/sysprof-6 \
 -pthread \
--L/home/jacob/Code/gimp/lib \
--L/home/jacob/Code/heightmap-visualizer-vft/lib/libepoxy/_build/src \
+-L$(GIMP_PREFIX)/lib \
+-Llib/libepoxy/_build/src \
 -lgimpui-3.0 -lgimpwidgets-3.0 -lgimpmodule-3.0 -lgimp-3.0 -lgimpbase-3.0 \
 -lgimpcolor-3.0 -lgimpconfig-3.0 -lgimpmath-3.0 -lgtk-3 -lgdk-3 -lz -lpangocairo-1.0 \
 -lcairo-gobject -latk-1.0 -lpango-1.0 -lharfbuzz -lgegl-0.4 -lgegl-npd-0.4 \
@@ -45,10 +45,10 @@ CFLAGS = -I/home/jacob/Code/gimp/include/gimp-3.0 \
 CC = gcc
 
 test: install
-	/home/jacob/Code/gimp/bin/gimp
+	$(GIMP_PREFIX)/bin/gimp
 
 install: build
-	cp ./heightmap-visualizer-vft /home/jacob/.config/GIMP/3.2/plug-ins/heightmap-visualizer-vft -f
+	cp ./heightmap-visualizer-vft $(HOME)/.config/GIMP/3.2/plug-ins/heightmap-visualizer-vft -f
 build: out/main.o
 	$(CC) -o heightmap-visualizer-vft out/*.o $(CFLAGS)
 
