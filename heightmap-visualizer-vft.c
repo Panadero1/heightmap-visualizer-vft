@@ -90,20 +90,24 @@ static GimpProcedure* heightmap_visualizer_create_procedure
     gimp_procedure_add_int_argument
       (procedure, "min-height", "Minimum Height",
       "the height corresponding to darkest colors",
-      -500, 500, 0, G_PARAM_READWRITE);
+      -1000, 1000, 0, G_PARAM_READWRITE);
 
     gimp_procedure_add_int_argument
       (procedure, "max-height", "Maximum Height",
       "the height corresponding to brightest colors",
-      -500, 500, 100, G_PARAM_READWRITE);
+      -1000, 1000, 100, G_PARAM_READWRITE);
+
       
     gimp_procedure_add_int_argument
       (procedure, "pixel-spacing", "Pixel Spacing",
       "the horizontal spacing between each pixel",
       0, 50, 8, G_PARAM_READWRITE);
-      
-    write_log("here?\n");
-    
+
+    gimp_procedure_add_boolean_argument
+      (procedure, "render-slope", "Render Slope",
+      "render the heightmap's color with slope values instead of height",
+      FALSE, G_PARAM_READWRITE);
+
     
     gint fake_argc = 0;
     gchar** fake_argv = NULL;
@@ -145,7 +149,7 @@ static GimpProcedure* heightmap_visualizer_create_procedure
 
 
 
-// start of my code
+// start of my gtk code
 // ============================================================================
 
 
@@ -163,11 +167,13 @@ char strbuf[100];
 unsigned int WIDTH = 800;
 unsigned int HEIGHT = 600;
 
+// procedure dialog variables
 static gint max_height = 100;
 static gint min_height = 0;
 static gint pixel_spacing = 8;
-static GimpGradient* visual_gradient;
+static GimpGradient* visual_gradient = NULL;
 static GimpDrawable* heightmap_layer = NULL;
+static gboolean render_slope = false;
 
 static GDateTime* start = NULL;
   
@@ -217,7 +223,7 @@ static void setup_heightmap() {
     write_log("heightmap can't find drawable\n");
     return;
   }
-  
+
   hm_width = gimp_drawable_get_width(heightmap_layer);
   hm_depth = gimp_drawable_get_height(heightmap_layer);
   
@@ -270,8 +276,6 @@ static void setup_heightmap() {
       }
       
       int sample_idx = (int)(brightness * 1000.0f);
-      gdouble r, g, b, a;
-      gegl_color_get_rgba(cols[sample_idx], &r, &g, &b, &a);
       
       // lerp
       float y = lerp(brightness, min_height, max_height);
@@ -279,9 +283,125 @@ static void setup_heightmap() {
       vtx[i].x = fx;
       vtx[i].y = y;
       vtx[i].z = fz;
-      vtx[i].r = r;
-      vtx[i].g = g;
-      vtx[i].b = b;
+      if (!render_slope) {
+        gdouble r, g, b, a;
+        gegl_color_get_rgba(cols[sample_idx], &r, &g, &b, &a);
+        vtx[i].r = r;
+        vtx[i].g = g;
+        vtx[i].b = b;
+      }
+    }
+  }
+
+  // slope calculations if needed
+  if (render_slope) {
+    for (int z = 0; z < hm_depth; z++) {
+      for (int x = 0; x < hm_width; x++) {
+        int i = z * hm_width + x;
+
+        vec3 v_c = {vtx[i].x, vtx[i].y, vtx[i].z};
+        
+        vec3 v_xn;
+        vec3 v_xp;
+        vec3 v_zn;
+        vec3 v_zp;
+        // checking (x-1, z)
+        if (x == 0) {
+          glm_vec3_copy(v_c, v_xn);
+        } else {
+          struct Vertex v = vtx[i-1];
+          v_xn[0] = v.x;
+          v_xn[1] = v.y;
+          v_xn[2] = v.z;
+        }
+        // checking (x+1, z)
+        if (x == (hm_width - 1)) {
+          glm_vec3_copy(v_c, v_xp);
+        } else {
+          struct Vertex v = vtx[i+1];
+          v_xp[0] = v.x;
+          v_xp[1] = v.y;
+          v_xp[2] = v.z;
+        }
+        // checking (x, z-1)
+        if (z == 0) {
+          glm_vec3_copy(v_c, v_zn);
+        } else {
+          struct Vertex v = vtx[i-hm_width];
+          v_zn[0] = v.x;
+          v_zn[1] = v.y;
+          v_zn[2] = v.z;
+        }
+        // checking (x, z+1)
+        if (z == (hm_depth - 1)) {
+          glm_vec3_copy(v_c, v_zp);
+        } else {
+          struct Vertex v = vtx[i+hm_width];
+          v_zp[0] = v.x;
+          v_zp[1] = v.y;
+          v_zp[2] = v.z;
+        }
+
+        vec3 v_dx;
+        vec3 v_dz;
+
+        glm_vec3_sub(v_xp, v_xn, v_dx);
+        glm_vec3_sub(v_zp, v_zn, v_dz);
+
+        vec3 v_n;
+        vec3 v_r;
+        vec3 v_u;
+
+        glm_vec3_cross(v_dx, v_dz, v_n);
+        glm_vec3_cross(GLM_YUP, v_n, v_r);
+        glm_vec3_cross(v_n, v_r, v_u);
+
+        if (v_u[1] < 0.0f) {
+          glm_vec3_negate(v_u);
+        }
+
+        float slope;
+
+        if (v_u[1] == 0.0f) {
+          slope = 0.0f;
+        } else {
+          slope = v_u[1] / (sqrt((v_u[0] * v_u[0]) + (v_u[2] * v_u[2])));
+        }
+
+
+
+
+
+        // mapping a possibly infinite range into [0, 1]
+        // by the function 1/(1+x)
+        // slope infinity - 1000 -> 0 pix bucket
+        // slope infinity - 501 -> 1 pix bucket
+        // slope 500 - 330 -> 2 pix bucket
+        // slope 330 - 249 -> 3 pix bucket
+        // slope 250 - 200 -> 4
+        // slope 200 - 167 -> 5
+        // ...
+        // 109-101 -> 9
+        // ...
+        // 18.2 - 17.9 -> 51
+        // etc
+        // higher precision as the slope decreases
+        float slope_resolution = 240.0f;
+
+        float encoded_slope = slope * slope_resolution;
+
+        if (encoded_slope > 1000.0f) {
+          encoded_slope = 1000.0f;
+        }
+
+        int sample_idx = (int)(encoded_slope);
+
+        gdouble r, g, b, a;
+        gegl_color_get_rgba(cols[sample_idx], &r, &g, &b, &a);
+        vtx[i].r = r;
+        vtx[i].g = g;
+        vtx[i].b = b;
+      }
     }
   }
   
@@ -588,6 +708,7 @@ heightmap_visualizer_run (GimpProcedure        *procedure,
     "min-height",       &min_height,
     "pixel-spacing",    &pixel_spacing,
     "visual-gradient",  &visual_gradient,
+    "render-slope",     &render_slope,
     NULL);
     
   write_log("main 2\n");
