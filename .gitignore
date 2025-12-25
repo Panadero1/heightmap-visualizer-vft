@@ -6,4 +6,5 @@ logfile.txt
 *.exe
 *.xcf
 example.c
+heightmap-visualizer-vft
 .gitignore
