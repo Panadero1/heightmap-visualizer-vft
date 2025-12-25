@@ -1,4 +1,4 @@
-# Using Heightmap VIsualizer with Zero-k and other Spring RTS games
+# Using Heightmap Visualizer with Zero-k and other Spring RTS games
 
 ## Slope gradient color rendering
 

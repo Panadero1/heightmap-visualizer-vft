@@ -28,11 +28,11 @@ Watch the beautiful visualization!
 4. Remember to clone the submodules in this repository as well
 5. Follow build directions in lib/libepoxy/README.md
 6. The cglm library doesn't need to be build, as it's header-only
-7. Then run `make build` and the executable should be present in this directory
-8. Follow install instructions, or edit the Makefile's `install` target to install it to your GIMP
+7. Then run `make -f Makefile-<PLATFORM> build` and the executable should be present in this directory
+8. Follow install instructions, or edit the Makefile's `install` target to install it to your GIMP's plugin directory automatically
 
 ## If you're on windows
-Download mingw and make sure you have make and gcc installed
+Download mingw and make sure you have make and gcc/clang installed (you can configure the compiler in your platform's makefile)
 
 # For Zero-K (or other Spring RTS games)
 
