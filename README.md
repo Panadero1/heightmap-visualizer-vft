@@ -34,6 +34,10 @@ Watch the beautiful visualization!
 ## If you're on windows
 Download mingw and make sure you have make and gcc installed
 
+# For Zero-K (or other Spring RTS games)
+
+Please see the `zk` directory for specific instructions
+
 # Gallery
 
 A roughness texture
