@@ -6,3 +6,4 @@ logfile.txt
 *.exe
 *.xcf
 example.c
+.gitignore
